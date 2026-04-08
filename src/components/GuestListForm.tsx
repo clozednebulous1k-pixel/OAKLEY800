@@ -1,9 +1,11 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
 import { motion } from 'framer-motion';
+import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
 
 export const GuestListForm: React.FC = () => {
   const formRef = useRef<HTMLDivElement>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -51,19 +53,43 @@ export const GuestListForm: React.FC = () => {
     };
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const form = e.currentTarget;
+    const nome = (form.elements.namedItem('nome') as HTMLInputElement).value.trim();
+    const curso = (form.elements.namedItem('curso') as HTMLInputElement).value.trim();
+    const semestre = (form.elements.namedItem('semestre') as HTMLInputElement).value.trim();
+
+    if (!isSupabaseConfigured()) {
+      alert(
+        'Cadastro indisponível: configure VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no arquivo .env (veja database/README.md).'
+      );
+      return;
+    }
+
+    const sb = getSupabase();
+    if (!sb) return;
+
+    setSubmitting(true);
+    const { error } = await sb.from('inscricoes').insert({ nome, curso, semestre });
+    setSubmitting(false);
+
+    if (error) {
+      alert(`Não foi possível salvar: ${error.message}`);
+      return;
+    }
+
     if (formRef.current) {
       gsap.to(formRef.current, {
         scale: 1.02,
         y: -10,
         duration: 0.2,
         yoyo: true,
-        repeat: 1
+        repeat: 1,
       });
-      alert('Cadastro realizado com sucesso! Ingresso garantido.');
-      (e.target as HTMLFormElement).reset();
     }
+    alert('Cadastro realizado com sucesso! Ingresso garantido.');
+    form.reset();
   };
 
   return (
@@ -74,7 +100,7 @@ export const GuestListForm: React.FC = () => {
       ref={formRef} 
       className="premium-form"
     >
-      <div style={{ marginBottom: 'clamp(1.5rem, 5vw, 3rem)' }}>
+      <div style={{ marginBottom: 'clamp(0.85rem, 3vw, 1.35rem)' }}>
         <h3 className="sub-headline" style={{ fontSize: 'clamp(0.85rem, 2.5vw, 1rem)', color: 'var(--oakley-red)' }}>O Cadastro</h3>
         <h2 className="premium-form__title" style={{ marginBottom: '0.5rem' }}>O fantástico mundo da Oakley</h2>
         <p style={{ color: 'rgba(255,255,255,0.6)' }}>Vai ficar de fora dessa?</p>
@@ -82,22 +108,22 @@ export const GuestListForm: React.FC = () => {
 
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <input type="text" id="nome" className="form-input" required placeholder=" " />
+          <input type="text" id="nome" name="nome" className="form-input" required placeholder=" " />
           <label htmlFor="nome" className="form-label">Nome</label>
         </div>
         
         <div className="form-group">
-          <input type="text" id="curso" className="form-input" required placeholder=" " />
+          <input type="text" id="curso" name="curso" className="form-input" required placeholder=" " />
           <label htmlFor="curso" className="form-label">Curso</label>
         </div>
         
         <div className="form-group">
-          <input type="text" id="semestre" className="form-input" required placeholder=" " />
+          <input type="text" id="semestre" name="semestre" className="form-input" required placeholder=" " />
           <label htmlFor="semestre" className="form-label">Semestre</label>
         </div>
         
-        <button type="submit" className="premium-button" style={{ marginTop: '1rem' }}>
-          Garantir Acesso VIP
+        <button type="submit" className="premium-button" disabled={submitting}>
+          {submitting ? 'Enviando…' : 'Garantir Acesso VIP'}
         </button>
       </form>
     </motion.div>
