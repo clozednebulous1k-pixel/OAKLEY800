@@ -205,44 +205,58 @@ const LandingPage: React.FC = () => {
           </div>
         </section>
 
-        <section
-          className="section-wrapper section-wrapper--compact gsap-reveal"
-          style={{ alignItems: 'flex-start' }}
-        >
-          <div
-            className="experience-card"
-            style={{
-              background: 'rgba(0,0,0,0.4)',
-              padding: '2rem',
-              backdropFilter: 'blur(5px)',
-              borderRadius: '8px',
-            }}
-          >
-            <h3 className="sub-headline" style={{ color: 'var(--oakley-red)' }}>
-              A Experiência
-            </h3>
-            <p
+        <section className="section-wrapper section-wrapper--compact" style={{ alignItems: 'flex-start' }}>
+          <div className="experience-layout">
+            <div
+              className="experience-card gsap-reveal"
               style={{
-                fontSize: 'clamp(1.5rem, 3vw, 3rem)',
-                lineHeight: '1.2',
-                fontWeight: 300,
-                marginBottom: '2rem',
+                background: 'rgba(0,0,0,0.4)',
+                padding: '2rem',
+                backdropFilter: 'blur(5px)',
+                borderRadius: '8px',
               }}
             >
-              Para fechar o semestre com tudo, chega a primeira edição do{' '}
-              <strong style={{ color: '#fff' }}>Fantástico Mundo da Oakley</strong>, no Senac Nações
-              Unidas.
-            </p>
-            <p
-              style={{
-                fontSize: 'clamp(1rem, 2vw, 1.5rem)',
-                lineHeight: '1.4',
-                color: 'rgba(255,255,255,0.7)',
-              }}
-            >
-              Em uma edição mais que especial, a Oakley convida um DJ diretamente do underground do
-              funk para comandar uma experiência imersiva que conecta música, cultura e atitude.
-            </p>
+              <h3 className="sub-headline" style={{ color: 'var(--oakley-red)' }}>
+                A Experiência
+              </h3>
+              <p
+                style={{
+                  fontSize: 'clamp(1.5rem, 3vw, 3rem)',
+                  lineHeight: '1.2',
+                  fontWeight: 300,
+                  marginBottom: '2rem',
+                }}
+              >
+                Para fechar o semestre com tudo, chega a primeira edição do{' '}
+                <strong style={{ color: '#fff' }}>Fantástico Mundo da Oakley</strong>, no Senac Nações
+                Unidas.
+              </p>
+              <p
+                style={{
+                  fontSize: 'clamp(1rem, 2vw, 1.5rem)',
+                  lineHeight: '1.4',
+                  color: 'rgba(255,255,255,0.7)',
+                }}
+              >
+                Em uma edição mais que especial, a Oakley convida um DJ diretamente do underground do
+                funk para comandar uma experiência imersiva que conecta música, cultura e atitude.
+              </p>
+            </div>
+
+            <div className="experience-thumbs">
+              <figure className="experience-thumb gsap-reveal">
+                <img src="/galeria1.jpg.jpeg" alt="Detalhe visual Oakley" />
+              </figure>
+              <figure className="experience-thumb gsap-reveal">
+                <img src="/galeria2.jpg.jpeg" alt="Detalhe visual Oakley" />
+              </figure>
+              <figure className="experience-thumb gsap-reveal">
+                <img src="/galeria3.jpg.jpeg" alt="Detalhe visual Oakley" />
+              </figure>
+              <figure className="experience-thumb gsap-reveal">
+                <img src="/galeria4.jpg.jpeg" alt="Detalhe visual Oakley" />
+              </figure>
+            </div>
           </div>
         </section>
 

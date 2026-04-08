@@ -26,6 +26,17 @@ export const Cursor: React.FC = () => {
   const [hovered, setHovered] = useState(false);
 
   useEffect(() => {
+    if (useCustomCursor) {
+      document.body.classList.add('custom-cursor-enabled');
+    } else {
+      document.body.classList.remove('custom-cursor-enabled');
+    }
+    return () => {
+      document.body.classList.remove('custom-cursor-enabled');
+    };
+  }, [useCustomCursor]);
+
+  useEffect(() => {
     if (!useCustomCursor) return;
 
     const handleMouseMove = (e: MouseEvent) => {
