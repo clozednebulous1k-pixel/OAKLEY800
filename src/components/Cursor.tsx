@@ -1,10 +1,33 @@
 import React, { useEffect, useState } from 'react';
 
+/** Mesma ideia do `body { cursor: none }` em index.css: só mouse de verdade, não touch/celular */
+const FINE_CURSOR_MQ = '(hover: hover) and (pointer: fine)';
+
+function useFinePointerCursor(): boolean {
+  const [active, setActive] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia(FINE_CURSOR_MQ).matches;
+  });
+
+  useEffect(() => {
+    const mq = window.matchMedia(FINE_CURSOR_MQ);
+    const sync = () => setActive(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
+
+  return active;
+}
+
 export const Cursor: React.FC = () => {
+  const useCustomCursor = useFinePointerCursor();
   const [position, setPosition] = useState({ x: -100, y: -100 });
   const [hovered, setHovered] = useState(false);
 
   useEffect(() => {
+    if (!useCustomCursor) return;
+
     const handleMouseMove = (e: MouseEvent) => {
       setPosition({ x: e.clientX, y: e.clientY });
     };
@@ -31,7 +54,9 @@ export const Cursor: React.FC = () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseover', handleMouseOver);
     };
-  }, []);
+  }, [useCustomCursor]);
+
+  if (!useCustomCursor) return null;
 
   return (
     <>
