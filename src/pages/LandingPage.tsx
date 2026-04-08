@@ -155,7 +155,7 @@ const LandingPage: React.FC = () => {
           height: '100vh',
           objectFit: 'cover',
           objectPosition: 'center center',
-          transform: 'scale(0.98)',
+          transform: 'scale(1.03)',
           transformOrigin: 'center center',
           zIndex: -2,
           opacity: 0,
