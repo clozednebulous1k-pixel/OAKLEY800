@@ -383,6 +383,11 @@ h1, h2, h3, h4, h5 {
   overflow: hidden;
 }
 
+/* O <canvas> do R3F herda pointer-events: auto e roubava cliques na faixa inferior (botão do form no mobile). */
+.end-glasses-canvas * {
+  pointer-events: none !important;
+}
+
 @media (max-width: 768px) {
   .end-glasses-canvas {
     height: min(30vh, 280px);
