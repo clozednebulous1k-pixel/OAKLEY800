@@ -16,6 +16,7 @@ alter table public.inscricoes enable row level security;
 
 drop policy if exists "inscricoes_insert_public" on public.inscricoes;
 drop policy if exists "inscricoes_select_admin" on public.inscricoes;
+drop policy if exists "inscricoes_delete_admin" on public.inscricoes;
 
 -- Visitantes podem enviar inscrição (chave anon do front)
 create policy "inscricoes_insert_public"
@@ -28,5 +29,12 @@ create policy "inscricoes_insert_public"
 create policy "inscricoes_select_admin"
   on public.inscricoes
   for select
+  to authenticated
+  using (true);
+
+-- Só admin logado pode remover permanentemente
+create policy "inscricoes_delete_admin"
+  on public.inscricoes
+  for delete
   to authenticated
   using (true);

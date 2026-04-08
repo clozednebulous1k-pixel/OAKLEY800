@@ -15,6 +15,7 @@ const AdminPanel: React.FC = () => {
   const [rows, setRows] = useState<Inscricao[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     const sb = getSupabase();
@@ -54,6 +55,23 @@ const AdminPanel: React.FC = () => {
     const sb = getSupabase();
     await sb?.auth.signOut();
     navigate('/admin/login', { replace: true });
+  };
+
+  const handleDelete = async (row: Inscricao) => {
+    const sb = getSupabase();
+    if (!sb) return;
+    const ok = window.confirm(
+      `Remover permanentemente a inscrição de "${row.nome}"?\n\nEssa ação não pode ser desfeita.`
+    );
+    if (!ok) return;
+    setDeletingId(row.id);
+    const { error: delErr } = await sb.from('inscricoes').delete().eq('id', row.id);
+    setDeletingId(null);
+    if (delErr) {
+      setError(delErr.message);
+      return;
+    }
+    setRows((prev) => prev.filter((r) => r.id !== row.id));
   };
 
   const formatDate = (iso: string) => {
@@ -98,6 +116,7 @@ const AdminPanel: React.FC = () => {
                   <th>Nome</th>
                   <th>Curso</th>
                   <th>Semestre</th>
+                  <th>Ações</th>
                 </tr>
               </thead>
               <tbody>
@@ -107,6 +126,16 @@ const AdminPanel: React.FC = () => {
                     <td>{r.nome}</td>
                     <td>{r.curso}</td>
                     <td>{r.semestre}</td>
+                    <td>
+                      <button
+                        type="button"
+                        className="admin-row-delete"
+                        onClick={() => handleDelete(r)}
+                        disabled={deletingId === r.id}
+                      >
+                        {deletingId === r.id ? 'Removendo…' : 'Remover permanentemente'}
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
