@@ -37,8 +37,8 @@ const Header = () => (
 
 const App: React.FC = () => {
   const contentRef = useRef<HTMLDivElement>(null);
-  const pinSectionRef = useRef<HTMLElement>(null);
-  const pinWrapRef = useRef<HTMLDivElement>(null);
+  const verticalGallerySectionRef = useRef<HTMLElement>(null);
+  const phraseGallerySectionRef = useRef<HTMLElement>(null);
   const modelBgRef = useRef<HTMLImageElement>(null);
   const heroSectionRef = useRef<HTMLElement>(null);
   const eventListSectionRef = useRef<HTMLElement>(null);
@@ -79,48 +79,45 @@ const App: React.FC = () => {
       });
     }
 
-    // Foto de fundo + rodapé: mesma lógica no scroll do Lenis
+    // Foto de fundo: hero + ao entrar na seção do card (Palco 360, lista, ALERTA)
     const MAX_BG = 0.42;
+    const MAX_BG_END = 0.5;
     const updateScrollChrome = () => {
       const img = modelBgRef.current;
-      const eventList = eventListSectionRef.current;
+      const hero = heroSectionRef.current;
+      const eventListSection = eventListSectionRef.current;
       const last = lastSectionRef.current;
       const footer = footerRef.current;
-      const pinEl = pinSectionRef.current;
-      if (!last) return;
+      if (!last || !hero) return;
 
       const vh = window.innerHeight;
+      const heroR = hero.getBoundingClientRect();
       const lastR = last.getBoundingClientRect();
-      const eventListR = eventList?.getBoundingClientRect();
-
-      // Foto só depois de terminar o scroll horizontal (pin + scrub completo)
-      const stPin = ScrollTrigger.getById('st-horizontal-pin');
-      let horizontalDone = false;
-      if (stPin) {
-        horizontalDone = stPin.progress >= 0.998;
-      } else if (pinEl) {
-        const pr = pinEl.getBoundingClientRect();
-        horizontalDone = pr.bottom < 0;
-      }
+      const eventListR = eventListSection?.getBoundingClientRect();
 
       let op = 0;
 
       if (img) {
-        if (horizontalDone) {
-          // Lista de eventos + ALERTA: fade da foto após a faixa horizontal
-          if (eventListR && eventListR.bottom > 0 && eventListR.top < vh + vh * 0.45) {
-            const t = Math.min(
-              1,
-              Math.max(0, (vh * 1.2 - eventListR.top) / (vh * 0.58))
-            );
-            op = Math.max(op, MAX_BG * t);
-          }
+        // Começo: primeira dobra
+        if (heroR.bottom > 0 && heroR.top < vh) {
+          const blend = Math.min(1, heroR.bottom / (vh * 0.45));
+          op = Math.max(op, MAX_BG * blend);
+        }
 
-          if (lastR.bottom > 0 && lastR.top < vh) {
-            const travel = vh * 0.55;
-            const t = Math.min(1, Math.max(0, (vh - lastR.top) / travel));
-            op = Math.max(op, MAX_BG * t);
-          }
+        // Lista + card (Palco 360, etc.): foto entra quando a seção chega na tela
+        if (eventListR && eventListR.bottom > 0) {
+          const enter = Math.min(
+            1,
+            Math.max(0, (vh * 0.94 - eventListR.top) / (vh * 0.52))
+          );
+          op = Math.max(op, MAX_BG_END * enter);
+        }
+
+        // Reforço ao rolar até o ALERTA
+        if (lastR.bottom > 0 && lastR.top < vh) {
+          const travel = vh * 0.45;
+          const t = Math.min(1, Math.max(0, (vh - lastR.top) / travel));
+          op = Math.max(op, MAX_BG_END * t);
         }
 
         img.style.opacity = String(op);
@@ -152,25 +149,6 @@ const App: React.FC = () => {
       updateScrollChrome();
     };
     window.addEventListener('resize', onResize);
-
-    // Horizontal Scroll Gallery Logic (Pinning)
-    if (pinSectionRef.current && pinWrapRef.current) {
-      const pinWrapWidth = pinWrapRef.current.scrollWidth;
-      const horizontalScrollLength = pinWrapWidth - window.innerWidth;
-
-      gsap.to(pinWrapRef.current, {
-        scrollTrigger: {
-          id: 'st-horizontal-pin',
-          trigger: pinSectionRef.current,
-          pin: true,
-          scrub: 1, // Smooth scrubbing
-          start: "top top",
-          end: () => `+=${pinWrapWidth}`
-        },
-        x: -horizontalScrollLength,
-        ease: "none"
-      });
-    }
 
     requestAnimationFrame(() => {
       ScrollTrigger.refresh();
@@ -246,16 +224,29 @@ const App: React.FC = () => {
           </div>
         </section>
 
-        <VerticalImageGallery />
+        <VerticalImageGallery galleryRef={verticalGallerySectionRef} />
 
-        {/* --- HORIZONTAL PINNED GALLERY SECTION --- */}
-        <section id="sectionPin" ref={pinSectionRef}>
-          <div className="pin-wrap" ref={pinWrapRef}>
-            <h2>Uma noite que vai entrar pra história da cultura urbana. Vivencie a verdadeira atitude Oakley.</h2>
-            <img src="/galeria1.jpg.jpeg" alt="Festa Oakley vista de cima" />
-            <img src="/galeria2.jpg.jpeg" alt="Galera no evento" />
-            <img src="/galeria3.jpg.jpeg" alt="DJ no palco underground" />
-            <img src="/galeria4.jpg.jpeg" alt="Estilo das ruas" />
+        <section
+          id="sectionPhraseGallery"
+          ref={phraseGallerySectionRef}
+          className="section-wrapper section-wrapper--phrase-gallery"
+        >
+          <h2 className="phrase-gallery__headline gsap-reveal">
+            Uma noite que vai entrar pra história da cultura urbana. Vivencie a verdadeira atitude Oakley.
+          </h2>
+          <div className="phrase-gallery__images">
+            <figure className="phrase-gallery__figure gsap-reveal">
+              <img src="/galeria1.jpg.jpeg" alt="Festa Oakley vista de cima" />
+            </figure>
+            <figure className="phrase-gallery__figure gsap-reveal">
+              <img src="/galeria2.jpg.jpeg" alt="Galera no evento" />
+            </figure>
+            <figure className="phrase-gallery__figure gsap-reveal">
+              <img src="/galeria3.jpg.jpeg" alt="DJ no palco underground" />
+            </figure>
+            <figure className="phrase-gallery__figure gsap-reveal">
+              <img src="/galeria4.jpg.jpeg" alt="Estilo das ruas" />
+            </figure>
           </div>
         </section>
 

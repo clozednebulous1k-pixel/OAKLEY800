@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type MutableRefObject, type Ref } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -14,8 +14,19 @@ const IMAGES = [
   '/galeria1.jpg.jpeg',
 ];
 
-export function VerticalImageGallery() {
+type VerticalImageGalleryProps = {
+  /** Ref na <section> — para sincronizar foto de fundo ao fim do scroll desta galeria */
+  galleryRef?: Ref<HTMLElement>;
+};
+
+export function VerticalImageGallery({ galleryRef }: VerticalImageGalleryProps) {
   const sectionRef = useRef<HTMLElement>(null);
+
+  const setSectionRef = (el: HTMLElement | null) => {
+    sectionRef.current = el;
+    if (typeof galleryRef === 'function') galleryRef(el);
+    else if (galleryRef) (galleryRef as MutableRefObject<HTMLElement | null>).current = el;
+  };
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -110,7 +121,7 @@ export function VerticalImageGallery() {
   const colC = IMAGES.slice(6, 9);
 
   return (
-    <section ref={sectionRef} className="vertical-gallery-section" aria-label="Galeria Oakley">
+    <section ref={setSectionRef} className="vertical-gallery-section" aria-label="Galeria Oakley">
       <div className="vertical-gallery__viewport">
         <h2 className="vertical-gallery__title">OAKLEY x SUBMUNDO x FUNK</h2>
 
