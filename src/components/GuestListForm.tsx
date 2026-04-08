@@ -74,9 +74,9 @@ export const GuestListForm: React.FC = () => {
       ref={formRef} 
       className="premium-form"
     >
-      <div style={{ marginBottom: '3rem' }}>
-        <h3 className="sub-headline" style={{ fontSize: '1rem', color: 'var(--oakley-red)' }}>O Cadastro</h3>
-        <h2 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>O fantástico mundo da Oakley</h2>
+      <div style={{ marginBottom: 'clamp(1.5rem, 5vw, 3rem)' }}>
+        <h3 className="sub-headline" style={{ fontSize: 'clamp(0.85rem, 2.5vw, 1rem)', color: 'var(--oakley-red)' }}>O Cadastro</h3>
+        <h2 className="premium-form__title" style={{ marginBottom: '0.5rem' }}>O fantástico mundo da Oakley</h2>
         <p style={{ color: 'rgba(255,255,255,0.6)' }}>Vai ficar de fora dessa?</p>
       </div>
 

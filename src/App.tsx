@@ -14,6 +14,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 const Header = () => (
   <motion.header 
+    className="site-header"
     initial={{ opacity: 0, y: -20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 1, delay: 2.8 }}
@@ -22,14 +23,13 @@ const Header = () => (
       top: 0,
       left: 0,
       width: '100%',
-      padding: '2rem 4rem',
       zIndex: 100,
       display: 'flex',
       justifyContent: 'flex-start',
       mixBlendMode: 'difference'
     }}
   >
-    <div style={{ fontSize: '2rem', fontWeight: 900, letterSpacing: '-1px', color: '#fff' }}>
+    <div className="site-header__logo" style={{ fontWeight: 900, letterSpacing: '-1px', color: '#fff' }}>
       OAKLEY<span style={{ color: 'var(--oakley-red)' }}>.</span>
     </div>
   </motion.header>
@@ -39,8 +39,11 @@ const App: React.FC = () => {
   const contentRef = useRef<HTMLDivElement>(null);
   const pinSectionRef = useRef<HTMLElement>(null);
   const pinWrapRef = useRef<HTMLDivElement>(null);
-  const eventListSectionRef = useRef<HTMLElement>(null);
   const modelBgRef = useRef<HTMLImageElement>(null);
+  const heroSectionRef = useRef<HTMLElement>(null);
+  const eventListSectionRef = useRef<HTMLElement>(null);
+  const lastSectionRef = useRef<HTMLDivElement>(null);
+  const footerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const lenis = new Lenis({
@@ -56,7 +59,6 @@ const App: React.FC = () => {
       requestAnimationFrame(raf);
     }
     requestAnimationFrame(raf);
-    const removeLenisScroll = lenis.on('scroll', ScrollTrigger.update);
 
     if (contentRef.current) {
       const sections = contentRef.current.querySelectorAll('.gsap-reveal');
@@ -77,6 +79,80 @@ const App: React.FC = () => {
       });
     }
 
+    // Foto de fundo + rodapé: mesma lógica no scroll do Lenis
+    const MAX_BG = 0.42;
+    const updateScrollChrome = () => {
+      const img = modelBgRef.current;
+      const eventList = eventListSectionRef.current;
+      const last = lastSectionRef.current;
+      const footer = footerRef.current;
+      const pinEl = pinSectionRef.current;
+      if (!last) return;
+
+      const vh = window.innerHeight;
+      const lastR = last.getBoundingClientRect();
+      const eventListR = eventList?.getBoundingClientRect();
+
+      // Foto só depois de terminar o scroll horizontal (pin + scrub completo)
+      const stPin = ScrollTrigger.getById('st-horizontal-pin');
+      let horizontalDone = false;
+      if (stPin) {
+        horizontalDone = stPin.progress >= 0.998;
+      } else if (pinEl) {
+        const pr = pinEl.getBoundingClientRect();
+        horizontalDone = pr.bottom < 0;
+      }
+
+      let op = 0;
+
+      if (img) {
+        if (horizontalDone) {
+          // Lista de eventos + ALERTA: fade da foto após a faixa horizontal
+          if (eventListR && eventListR.bottom > 0 && eventListR.top < vh + vh * 0.45) {
+            const t = Math.min(
+              1,
+              Math.max(0, (vh * 1.2 - eventListR.top) / (vh * 0.58))
+            );
+            op = Math.max(op, MAX_BG * t);
+          }
+
+          if (lastR.bottom > 0 && lastR.top < vh) {
+            const travel = vh * 0.55;
+            const t = Math.min(1, Math.max(0, (vh - lastR.top) / travel));
+            op = Math.max(op, MAX_BG * t);
+          }
+        }
+
+        img.style.opacity = String(op);
+      }
+
+      // Rodapé aparece ao chegar perto da última seção (ALERTA)
+      if (footer) {
+        let ft = 0;
+        if (lastR.bottom > 0 && lastR.top < vh + vh * 0.35) {
+          ft = Math.min(
+            1,
+            Math.max(0, (vh * 1.15 - lastR.top) / (vh * 0.5))
+          );
+        }
+        footer.style.opacity = String(ft);
+        footer.style.transform = `translateY(${(1 - ft) * 20}px)`;
+        footer.style.pointerEvents = ft > 0.12 ? 'auto' : 'none';
+        footer.setAttribute('aria-hidden', ft < 0.08 ? 'true' : 'false');
+      }
+    };
+
+    const removeLenisScroll = lenis.on('scroll', () => {
+      ScrollTrigger.update();
+      updateScrollChrome();
+    });
+    updateScrollChrome();
+    const onResize = () => {
+      ScrollTrigger.refresh();
+      updateScrollChrome();
+    };
+    window.addEventListener('resize', onResize);
+
     // Horizontal Scroll Gallery Logic (Pinning)
     if (pinSectionRef.current && pinWrapRef.current) {
       const pinWrapWidth = pinWrapRef.current.scrollWidth;
@@ -84,6 +160,7 @@ const App: React.FC = () => {
 
       gsap.to(pinWrapRef.current, {
         scrollTrigger: {
+          id: 'st-horizontal-pin',
           trigger: pinSectionRef.current,
           pin: true,
           scrub: 1, // Smooth scrubbing
@@ -95,23 +172,16 @@ const App: React.FC = () => {
       });
     }
 
-    // Fade dinâmico da foto do Modelo apenas na tela de Listagem de Eventos
-    if (modelBgRef.current && eventListSectionRef.current) {
-      gsap.to(modelBgRef.current, {
-        opacity: 0.3, // Brilho suave da foto no fundo para não ofuscar o texto
-        scrollTrigger: {
-          trigger: eventListSectionRef.current,
-          start: "top 60%", // Começa a aparecer quando a lista chega no meio da tela
-          end: "bottom 40%", // Some quando a lista sai de foco
-          toggleActions: "play reverse play reverse", // Anima in-and-out perfeitamente
-        }
-      });
-    }
+    requestAnimationFrame(() => {
+      ScrollTrigger.refresh();
+      updateScrollChrome();
+    });
 
     return () => {
+      window.removeEventListener('resize', onResize);
       removeLenisScroll();
       lenis.destroy();
-      ScrollTrigger.getAll().forEach(t => t.kill());
+      ScrollTrigger.getAll().forEach((t) => t.kill());
     };
   }, []);
 
@@ -121,15 +191,34 @@ const App: React.FC = () => {
       <Cursor />
       <Header />
       
-      {/* Camada Dinâmica da Foto de Fundo da Sessão de Lista (z-index: -2) */}
-      <img ref={modelBgRef} src="/modelo.jpg.jpeg" alt="Modelo Oakley" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', objectFit: 'cover', zIndex: -2, opacity: 0, filter: 'grayscale(0.5)' }} />
+      {/* Mesma foto de fundo do restante do site, visível desde o hero (sem partículas no canvas) */}
+      <img
+        ref={modelBgRef}
+        src="/modelo.jpg.jpeg"
+        alt=""
+        aria-hidden
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          objectFit: 'cover',
+          zIndex: -2,
+          opacity: 0,
+          filter: 'grayscale(0.5)',
+        }}
+      />
 
-      <Background3D /> {/* Óculos Flutuante + Ondas (z-index: -1) */}
+      <Background3D /> {/* Óculos 3D (z-index: -1) */}
 
       <main ref={contentRef} style={{ position: 'relative', zIndex: 10 }}>
         
-        <section className="section-wrapper section-wrapper--hero" style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 'clamp(2rem, 8vw, 10vw)' }}>
-          <div style={{ flex: 1, paddingRight: '4rem' }}>
+        <section
+          ref={heroSectionRef}
+          className="section-wrapper section-wrapper--hero hero-landing"
+        >
+          <div className="hero-landing__headline">
             <motion.h1 
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
@@ -140,13 +229,13 @@ const App: React.FC = () => {
             </motion.h1>
           </div>
           
-          <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
+          <div className="hero-landing__form">
              <GuestListForm />
           </div>
         </section>
 
         <section className="section-wrapper section-wrapper--compact gsap-reveal" style={{ alignItems: 'flex-start' }}>
-          <div style={{ maxWidth: '800px', background: 'rgba(0,0,0,0.4)', padding: '2rem', backdropFilter: 'blur(5px)', borderRadius: '8px' }}>
+          <div className="experience-card" style={{ background: 'rgba(0,0,0,0.4)', padding: '2rem', backdropFilter: 'blur(5px)', borderRadius: '8px' }}>
             <h3 className="sub-headline" style={{ color: 'var(--oakley-red)' }}>A Experiência</h3>
             <p style={{ fontSize: 'clamp(1.5rem, 3vw, 3rem)', lineHeight: '1.2', fontWeight: 300, marginBottom: '2rem' }}>
               Para fechar o semestre com tudo, chega a primeira edição do <strong style={{color: '#fff'}}>Fantástico Mundo da Oakley</strong>, no Senac Nações Unidas.
@@ -170,29 +259,43 @@ const App: React.FC = () => {
           </div>
         </section>
 
-        {/* REFFED SECTION CAUSING DYNAMIC BACKGROUND TO SHOW */}
-        <section ref={eventListSectionRef} className="section-wrapper" style={{ alignItems: 'center' }}>
-           <ul className="event-list" style={{ background: 'rgba(0,0,0,0.6)', padding: '3rem', borderRadius: '8px', backdropFilter: 'blur(10px)' }}>
-              <li className="event-list-item gsap-reveal">Palco 360</li>
-              <li className="event-list-item gsap-reveal">Ativações imersivas e experiências de marca</li>
-              <li className="event-list-item gsap-reveal">Brindes exclusivos Oakley</li>
-              <li className="event-list-item gsap-reveal" style={{ fontSize: '1rem', color: 'var(--oakley-red)' }}>Evento para maiores de 18 anos</li>
-              <li className="event-list-item gsap-reveal" style={{ fontSize: '1rem', opacity: 0.6 }}>Este evento celebra a cultura do funk e do DJ em todas as suas expressões</li>
-           </ul>
-        </section>
+        {/* Lista + ALERTA no mesmo bloco — card compacto centralizado abaixo das infos */}
+        <section
+          ref={eventListSectionRef}
+          className="section-wrapper section-wrapper--event-list-block"
+        >
+          <ul className="event-list event-list-shell" style={{ background: 'rgba(0,0,0,0.6)', padding: '3rem', borderRadius: '8px', backdropFilter: 'blur(10px)' }}>
+            <li className="event-list-item gsap-reveal">Palco 360</li>
+            <li className="event-list-item gsap-reveal">Ativações imersivas e experiências de marca</li>
+            <li className="event-list-item gsap-reveal">Brindes exclusivos Oakley</li>
+            <li className="event-list-item gsap-reveal" style={{ fontSize: '1rem', color: 'var(--oakley-red)' }}>Evento para maiores de 18 anos</li>
+            <li className="event-list-item gsap-reveal" style={{ fontSize: '1rem', opacity: 0.6 }}>Este evento celebra a cultura do funk e do DJ em todas as suas expressões</li>
+          </ul>
 
-        <section className="section-wrapper gsap-reveal" style={{ minHeight: '50vh', textAlign: 'center', justifyContent: 'center' }}>
-           <div style={{ padding: '3rem', border: '1px solid rgba(255, 255, 255, 0.1)', background: 'rgba(0, 0, 0, 0.7)', borderRadius: '8px', backdropFilter: 'blur(15px)' }}>
-             <h2 style={{ fontSize: '2rem', marginBottom: '1rem' }}>ALERTA DE ACESSO</h2>
-             <p style={{ fontSize: '1.2rem', color: 'rgba(255,255,255,0.8)' }}>
-               O ingresso é <strong>GRATUITO</strong>, mas para acessar o evento, precisa estar cadastrado.<br/> 
-               <span style={{ color: 'var(--oakley-red)', fontWeight: 'bold' }}>NÃO ENTRA SEM NOME NA LISTA.</span><br/>
-               O seu ingresso garante acesso ao evento completo!
-             </p>
-           </div>
+          <div ref={lastSectionRef} className="alerta-inline gsap-reveal">
+            <div className="alerta-card">
+              <p className="alerta-card__collab">OAKLEY x SUBMUNDO x FUNK</p>
+              <h2 className="alerta-card__title">ALERTA DE ACESSO</h2>
+              <p className="alerta-card__text">
+                O ingresso é <strong>GRATUITO</strong>, mas para acessar o evento, precisa estar cadastrado.
+              </p>
+              <p className="alerta-card__warn">NÃO ENTRA SEM NOME NA LISTA.</p>
+              <p className="alerta-card__text alerta-card__text--last">
+                O seu ingresso garante acesso ao evento completo!
+              </p>
+            </div>
+          </div>
         </section>
 
       </main>
+
+      <footer ref={footerRef} className="site-footer">
+        <div className="site-footer__brand">
+          OAKLEY x SUBMUNDO x FUNK
+        </div>
+        <p className="site-footer__meta">Senac Nações Unidas · Evento 18+</p>
+        <small className="site-footer__copy">© {new Date().getFullYear()} Oakley Brasil</small>
+      </footer>
     </>
   );
 };
