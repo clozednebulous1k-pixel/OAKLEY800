@@ -38,3 +38,8 @@ create policy "inscricoes_delete_admin"
   for delete
   to authenticated
   using (true);
+
+-- Permissões explícitas (evita DELETE “silencioso” = 0 linhas se a role não tiver direito na tabela)
+grant usage on schema public to anon, authenticated;
+grant insert on public.inscricoes to anon;
+grant select, delete on public.inscricoes to authenticated;

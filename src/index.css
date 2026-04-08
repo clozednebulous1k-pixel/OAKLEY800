@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Boldonse&family=Jost:ital,wght@0,100..900;1,100..900&display=swap');
 
 :root {
   --color-bg: #030303;
@@ -11,7 +11,8 @@
   --oakley-red: #c60000;
   --oakley-red-glow: rgba(198, 0, 0, 0.4);
   
-  --font-main: 'Inter', sans-serif;
+  --font-main: 'Jost', sans-serif;
+  --font-display: 'Boldonse', sans-serif;
 
   --page-pad-x: clamp(1rem, 4vw, 4rem);
   --page-pad-y: clamp(3rem, 6vw, 6rem);
@@ -85,9 +86,10 @@ body {
   backdrop-filter: blur(0px);
 }
 
-/* Typography */
-h1, h2, h3, h4, h5 {
-  font-weight: 900;
+/* Typography — Jost no corpo; Boldonse nos títulos */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 400;
   text-transform: uppercase;
   letter-spacing: -0.02em;
 }
@@ -99,10 +101,16 @@ h1, h2, h3, h4, h5 {
   color: var(--color-text);
   margin-bottom: clamp(1rem, 4vw, 2rem);
   overflow-wrap: break-word;
-  hyphens: auto;
+  /* Evita quebra no meio de FANTÁSTICO (O indo para a linha de baixo) */
+  hyphens: none;
+}
+
+.headline-large__fantastico {
+  white-space: nowrap;
 }
 
 .sub-headline {
+  font-family: var(--font-main);
   font-size: clamp(1.2rem, 3vw, 2rem);
   font-weight: 300;
   letter-spacing: 0.2em;

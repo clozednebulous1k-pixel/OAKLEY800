@@ -65,10 +65,22 @@ const AdminPanel: React.FC = () => {
     );
     if (!ok) return;
     setDeletingId(row.id);
-    const { error: delErr } = await sb.from('inscricoes').delete().eq('id', row.id);
+    setError(null);
+    // `.select()` após delete: se RLS bloquear ou 0 linhas, `data` vem vazio — sem isso o client pode retornar error=null e a UI “some” a linha à toa.
+    const { data: deleted, error: delErr } = await sb
+      .from('inscricoes')
+      .delete()
+      .eq('id', row.id)
+      .select('id');
     setDeletingId(null);
     if (delErr) {
       setError(delErr.message);
+      return;
+    }
+    if (!deleted || deleted.length === 0) {
+      setError(
+        'O banco não removeu nenhuma linha. No Supabase, abra o SQL Editor e execute de novo o `schema.sql` (política `inscricoes_delete_admin` e permissões). Confirme também que você está logado no painel.'
+      );
       return;
     }
     setRows((prev) => prev.filter((r) => r.id !== row.id));

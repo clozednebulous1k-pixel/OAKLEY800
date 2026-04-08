@@ -31,3 +31,11 @@ Para produção, desative **“Enable email signups”** em Authentication se qu
 ## 5. Build / deploy
 
 Configure as mesmas variáveis `VITE_SUPABASE_*` no painel do host (Vercel, Netlify, etc.).
+
+## 6. Remover inscrição no admin e ela “volta” no F5
+
+Isso quase sempre significa que o **DELETE não apagou no Postgres** (mas a interface antiga podia sumir a linha mesmo assim).
+
+1. No Supabase, **SQL Editor** → rode de novo o arquivo `database/schema.sql` inteiro (idempotente: recria políticas e `grant`).
+2. Confirme que você entrou em `/admin/login` com um usuário de **Authentication → Users** (sessão `authenticated`).
+3. Se aparecer a mensagem de erro no painel após “Remover permanentemente”, siga o texto dela — o app agora só tira da lista quando o Supabase confirma que a linha foi deletada.

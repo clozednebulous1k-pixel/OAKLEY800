@@ -198,7 +198,7 @@ const LandingPage: React.FC = () => {
               transition={{ duration: 1.5, delay: 3 }}
               className="headline-large"
             >
-              FANTÁSTICO MUNDO.
+              <span className="headline-large__fantastico">FANTÁSTICO</span> MUNDO.
             </motion.h1>
           </div>
 
