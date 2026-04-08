@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { Cursor } from '../components/Cursor';
 import { Loader } from '../components/Loader';
 import { Background3D } from '../components/Background3D';
+import { EndGlasses3D } from '../components/EndGlasses3D';
 import { GuestListForm } from '../components/GuestListForm';
 import { VerticalImageGallery } from '../components/VerticalImageGallery';
 import { SiteHeader } from '../components/SiteHeader';
@@ -183,6 +184,7 @@ const LandingPage: React.FC = () => {
       />
 
       <Background3D />
+      <EndGlasses3D imageUrl="/oakley-end-glasses.png" triggerRef={lastSectionRef} />
 
       <main ref={contentRef} style={{ position: 'relative', zIndex: 10 }}>
         <section
