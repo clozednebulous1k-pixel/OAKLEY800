@@ -31,6 +31,10 @@ export function VerticalImageGallery({ galleryRef }: VerticalImageGalleryProps) 
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
+    const skipHeavyAnimation = window.matchMedia(
+      '(max-width: 768px), (prefers-reduced-motion: reduce)'
+    ).matches;
+    if (skipHeavyAnimation) return;
 
     let cancelled = false;
     const tweens: gsap.core.Tween[] = [];
