@@ -17,7 +17,6 @@ gsap.registerPlugin(ScrollTrigger);
 const LandingPage: React.FC = () => {
   const contentRef = useRef<HTMLDivElement>(null);
   const verticalGallerySectionRef = useRef<HTMLElement>(null);
-  const phraseGallerySectionRef = useRef<HTMLElement>(null);
   const heroBgRef = useRef<HTMLImageElement>(null);
   const endBgRef = useRef<HTMLImageElement>(null);
   const heroSectionRef = useRef<HTMLElement>(null);
@@ -145,7 +144,7 @@ const LandingPage: React.FC = () => {
 
       <img
         ref={heroBgRef}
-        src="/hero-background.png"
+        src="/hero-background-new.png"
         alt=""
         aria-hidden
         style={{
@@ -198,7 +197,7 @@ const LandingPage: React.FC = () => {
               transition={{ duration: 1.5, delay: 3 }}
               className="headline-large"
             >
-              <span className="headline-large__fantastico">FANTÁSTICO</span> MUNDO.
+              O BAILE É NOSSO!
             </motion.h1>
           </div>
 
@@ -264,29 +263,11 @@ const LandingPage: React.FC = () => {
 
         <VerticalImageGallery galleryRef={verticalGallerySectionRef} />
 
-        <section
-          id="sectionPhraseGallery"
-          ref={phraseGallerySectionRef}
-          className="section-wrapper section-wrapper--phrase-gallery"
-        >
+        <section className="section-wrapper section-wrapper--compact" style={{ minHeight: 'auto' }}>
           <h2 className="phrase-gallery__headline gsap-reveal">
             Uma noite que vai entrar pra história da cultura urbana. Vivencie a verdadeira atitude
             Oakley.
           </h2>
-          <div className="phrase-gallery__images">
-            <figure className="phrase-gallery__figure gsap-reveal">
-              <img src="/galeria1.jpg.jpeg" alt="Festa Oakley vista de cima" />
-            </figure>
-            <figure className="phrase-gallery__figure gsap-reveal">
-              <img src="/galeria2.jpg.jpeg" alt="Galera no evento" />
-            </figure>
-            <figure className="phrase-gallery__figure gsap-reveal">
-              <img src="/galeria3.jpg.jpeg" alt="DJ no palco underground" />
-            </figure>
-            <figure className="phrase-gallery__figure gsap-reveal">
-              <img src="/galeria4.jpg.jpeg" alt="Estilo das ruas" />
-            </figure>
-          </div>
         </section>
 
         <section
@@ -318,7 +299,7 @@ const LandingPage: React.FC = () => {
 
           <div ref={lastSectionRef} className="alerta-inline gsap-reveal">
             <div className="alerta-card">
-              <p className="alerta-card__collab">OAKLEY x SUBMUNDO x FUNK</p>
+              <p className="alerta-card__collab">OAKLEY x FUNK</p>
               <h2 className="alerta-card__title">ALERTA DE ACESSO</h2>
               <p className="alerta-card__text">
                 O ingresso é <strong>GRATUITO</strong>, mas para acessar o evento, precisa estar
@@ -334,7 +315,7 @@ const LandingPage: React.FC = () => {
       </main>
 
       <footer ref={footerRef} className="site-footer">
-        <div className="site-footer__brand">OAKLEY x SUBMUNDO x FUNK</div>
+        <div className="site-footer__brand">OAKLEY x FUNK</div>
         <p className="site-footer__meta">Senac Nações Unidas · Evento 18+</p>
         <small className="site-footer__copy">© {new Date().getFullYear()} Oakley Brasil</small>
       </footer>

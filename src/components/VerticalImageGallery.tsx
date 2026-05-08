@@ -3,15 +3,15 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 const IMAGES = [
-  '/galeria1.jpg.jpeg',
-  '/galeria2.jpg.jpeg',
-  '/galeria3.jpg.jpeg',
-  '/galeria4.jpg.jpeg',
-  '/galeria1.jpg.jpeg',
-  '/galeria2.jpg.jpeg',
-  '/galeria3.jpg.jpeg',
-  '/galeria4.jpg.jpeg',
-  '/galeria1.jpg.jpeg',
+  '/phrase-gallery-1.png',
+  '/phrase-gallery-2.png',
+  '/phrase-gallery-3.png',
+  '/phrase-gallery-4.png',
+  '/phrase-gallery-5.png',
+  '/phrase-gallery-1.png',
+  '/phrase-gallery-2.png',
+  '/phrase-gallery-3.png',
+  '/phrase-gallery-4.png',
 ];
 
 type VerticalImageGalleryProps = {
@@ -123,7 +123,7 @@ export function VerticalImageGallery({ galleryRef }: VerticalImageGalleryProps) 
   return (
     <section ref={setSectionRef} className="vertical-gallery-section" aria-label="Galeria Oakley">
       <div className="vertical-gallery__viewport">
-        <h2 className="vertical-gallery__title">OAKLEY x SUBMUNDO x FUNK</h2>
+        <h2 className="vertical-gallery__title">OAKLEY x FUNK</h2>
 
         <div className="vertical-gallery">
           <div className="vertical-gallery__col">

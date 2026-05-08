@@ -32,6 +32,14 @@ Para produção, desative **“Enable email signups”** em Authentication se qu
 
 Configure as mesmas variáveis `VITE_SUPABASE_*` no painel do host (Vercel, Netlify, etc.).
 
+## 5.1 Segurança (importante)
+
+- A `anon key` do Supabase em apps frontend **não é secreta**; ela pode aparecer no bundle e DevTools.
+- A proteção real vem de **RLS + policies mínimas + grants mínimos** (já contemplados no `schema.sql`).
+- **Nunca** use `service_role` no frontend.
+- Se você suspeitar vazamento/abuso, faça rotação da `anon key` em **Project Settings -> API** e atualize `.env` + host.
+- Considere habilitar CAPTCHA/rate-limit no endpoint de cadastro para reduzir spam.
+
 ## 6. Remover inscrição no admin e ela “volta” no F5
 
 Isso quase sempre significa que o **DELETE não apagou no Postgres** (mas a interface antiga podia sumir a linha mesmo assim).
