@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getSupabase, isSupabaseConfigured } from '../lib/supabase';
 
@@ -16,6 +16,13 @@ const AdminPanel: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [nomeBusca, setNomeBusca] = useState('');
+
+  const rowsFiltradas = useMemo(() => {
+    const q = nomeBusca.trim().toLowerCase();
+    if (!q) return rows;
+    return rows.filter((r) => r.nome.toLowerCase().includes(q));
+  }, [rows, nomeBusca]);
 
   const load = useCallback(async () => {
     const sb = getSupabase();
@@ -119,7 +126,38 @@ const AdminPanel: React.FC = () => {
           <p className="admin-panel__muted">Nenhuma inscrição ainda.</p>
         )}
 
-        {!loading && rows.length > 0 && (
+        {!loading && !error && rows.length > 0 && (
+          <div className="admin-panel__toolbar">
+            <p className="admin-panel__count" aria-live="polite">
+              <strong>{rows.length}</strong>{' '}
+              {rows.length === 1 ? 'pessoa inscrita' : 'pessoas inscritas'}
+              {nomeBusca.trim() !== '' && rowsFiltradas.length !== rows.length && (
+                <>
+                  {' '}
+                  · exibindo <strong>{rowsFiltradas.length}</strong> com o filtro
+                </>
+              )}
+            </p>
+            <label className="admin-panel__search">
+              <span className="admin-panel__search-label">Buscar por nome</span>
+              <input
+                type="search"
+                value={nomeBusca}
+                onChange={(e) => setNomeBusca(e.target.value)}
+                placeholder="Digite parte do nome…"
+                className="admin-panel__search-input"
+                autoComplete="off"
+                spellCheck={false}
+              />
+            </label>
+          </div>
+        )}
+
+        {!loading && !error && rows.length > 0 && nomeBusca.trim() !== '' && rowsFiltradas.length === 0 && (
+          <p className="admin-panel__muted">Nenhum resultado para essa busca.</p>
+        )}
+
+        {!loading && rowsFiltradas.length > 0 && (
           <div className="admin-table-wrap">
             <table className="admin-table">
               <thead>
@@ -132,7 +170,7 @@ const AdminPanel: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {rows.map((r) => (
+                {rowsFiltradas.map((r) => (
                   <tr key={r.id}>
                     <td>{formatDate(r.created_at)}</td>
                     <td>{r.nome}</td>

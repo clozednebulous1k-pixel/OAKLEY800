@@ -1027,6 +1027,57 @@ h1, h2, h3, h4, h5, h6 {
   font-size: 0.95rem;
 }
 
+.admin-panel__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.admin-panel__count {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.admin-panel__count strong {
+  color: #fff;
+  font-weight: 800;
+}
+
+.admin-panel__search {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: min(100%, 280px);
+  flex: 1 1 220px;
+}
+
+.admin-panel__search-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.admin-panel__search-input {
+  font-family: var(--font-main);
+  font-size: 0.95rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  outline: none;
+  width: 100%;
+}
+
+.admin-panel__search-input:focus {
+  border-color: var(--oakley-red);
+}
+
 .admin-table-wrap {
   overflow-x: auto;
   border: 1px solid rgba(255, 255, 255, 0.08);
