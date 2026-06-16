@@ -173,7 +173,7 @@ const AdminPanel: React.FC = () => {
               <tbody>
                 {rowsFiltradas.map((r, index) => (
                   <tr key={r.id}>
-                    <td className="admin-table__col-num">{index + 1}</td>
+                    <td className="admin-table__col-num">{rowsFiltradas.length - index}</td>
                     <td>{formatDate(r.created_at)}</td>
                     <td>{r.nome}</td>
                     <td>{r.curso}</td>
